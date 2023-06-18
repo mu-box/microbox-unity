@@ -1,6 +1,6 @@
-# nanobox-unity
+# microbox-unity
 ============================
-A small collection of scripts to set up new on-premise installations of Nanobox
+A small collection of scripts to set up new on-premise installations of Microbox
 
 Scripts
 -------
@@ -8,9 +8,9 @@ The scripts included here, and their individual purposes, are:
 
 - `provider/bin/bootstrap`: set up the hosting provider to house all required
   components of the installation
-- `controller/bootstrap`: script used to install Nanobox components
+- `controller/bootstrap`: script used to install Microbox components
 - `host/ubuntu.sh`: script used to provision and configure new app host servers
-  from within Nanobox itself
+  from within Microbox itself
 
 You should note the commit ID of the version of these scripts that you actually
 run, so that any audits of your infrastructure can be accurately performed.
@@ -37,8 +37,8 @@ within environments configured to use them:
 
 - **DMZ**: **D**e**m**ilitarized **Z**one, a zone which allows access from the
   outside world, so that it is still possible to access the various components
-  of the Nanobox deployment, and any apps running within it.
-- **MGZ**: **M**ana**g**ement **Z**one, used to host the Nanobox Controller, and
+  of the Microbox deployment, and any apps running within it.
+- **MGZ**: **M**ana**g**ement **Z**one, used to host the Microbox Controller, and
   any other components required to manage the intsallation.
 - **APZ**: **Ap**plication **Z**one, where all the deployed apps will end up.
 - **SDZ**: **S**ecure **D**ata **Z**one, used for secure but shared data
@@ -47,11 +47,11 @@ within environments configured to use them:
 
 In addition to the zones themselves is the overall security setup for each.
 
-Other configurations are possible via the `nanobox.yml` configuration file,
+Other configurations are possible via the `microbox.yml` configuration file,
 detailed below (along with the defaults above as described within that file).
 
 Once all of these are set up, we launch a server in each environment and set up
-the Nanobox Controller on each. The specifics of how these controllers are set
+the Microbox Controller on each. The specifics of how these controllers are set
 up is the responsibility of the `controller/bootstrap` script, detailed below.
 
 Finally, we ensure everything is properly configured, installed, and secured,
@@ -64,7 +64,7 @@ working as expected.
 ### `controller/bootstrap` ###
 
 The primary responsibility of this script is to perform the initial setup of a
-Nanobox controller, ensuring the associated software and services are properly
+Microbox controller, ensuring the associated software and services are properly
 installed and configured for each environment. It will also ensure the required
 user accounts are properly set up on the controller, so that the environment can
 properly be managed.
@@ -72,8 +72,8 @@ properly be managed.
 ### `host/ubuntu.sh` ###
 _TODO_
 
-An extended version of [the public Nanobox bootstrap
-script](https://github.com/nanobox-io/bootstrap/blob/master/ubuntu.sh), with
+An extended version of [the public Microbox bootstrap
+script](https://github.com/mu-box/bootstrap/blob/main/ubuntu.sh), with
 adjustments for an on-premise configuration, such as installing/configuring a
 File Integrity Monitor (FIM), and automatically shipping system logs to an
 external location/service.

@@ -18,12 +18,12 @@ for fn in os.listdir(os.path.join(os.path.dirname(__file__), 'adapters')):
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-a', '--adapter', type=click.Choice(adapters.keys()),
-              prompt=True, envvar='NANOBOX_ADAPTER',
-              help=('The adapter for the provider to set up the Nanobox '
+              prompt=True, envvar='MICROBOX_ADAPTER',
+              help=('The adapter for the provider to set up the Microbox '
                     'infrastructure on'))
 @click.option('verbosity', '-v', '--verbose', count=True,
               help='Enable verbose output; multiple uses increase verbosity')
-@click.option('conf', '-c', '--config', default='nanobox.yml',
+@click.option('conf', '-c', '--config', default='microbox.yml',
               type=click.Path(dir_okay=False, resolve_path=True),
               help='Select a configuration file to load customizations from')
 @click.option('dump', '-d', '--dump', is_flag=True,

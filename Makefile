@@ -10,8 +10,8 @@ all: controller host provider vpn
 controller: controller/install/ubuntu.md5 controller/update/ubuntu.md5 controller/upgrade/ubuntu.md5
 	for i in install update upgrade; do \
 	  for j in ubuntu; do \
-	    aws s3 cp --acl public-read controller/$$i/$$j.sh s3://unity.nanobox.io/bootstrap/controller/$$j/$$i; \
-	    aws s3 cp --acl public-read controller/$$i/$$j.md5 s3://unity.nanobox.io/bootstrap/controller/$$j/$$i.md5; \
+	    aws s3 cp --acl public-read controller/$$i/$$j.sh s3://unity.microbox.cloud/bootstrap/controller/$$j/$$i; \
+	    aws s3 cp --acl public-read controller/$$i/$$j.md5 s3://unity.microbox.cloud/bootstrap/controller/$$j/$$i.md5; \
 	  done; \
 	done
 
@@ -22,7 +22,7 @@ provider:
 vpn: vpn/install/ubuntu.md5 vpn/update/ubuntu.md5 vpn/upgrade/ubuntu.md5
 	for i in install update upgrade; do \
 	  for j in ubuntu; do \
-	    aws s3 cp --acl public-read vpn/$$i/$$j.sh s3://unity.nanobox.io/bootstrap/vpn/$$j/$$i; \
-	    aws s3 cp --acl public-read vpn/$$i/$$j.md5 s3://unity.nanobox.io/bootstrap/vpn/$$j/$$i.md5; \
+	    aws s3 cp --acl public-read vpn/$$i/$$j.sh s3://unity.microbox.cloud/bootstrap/vpn/$$j/$$i; \
+	    aws s3 cp --acl public-read vpn/$$i/$$j.md5 s3://unity.microbox.cloud/bootstrap/vpn/$$j/$$i.md5; \
 	  done; \
 	done

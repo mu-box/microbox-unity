@@ -67,7 +67,7 @@ def environment_setup(ctx, env, info):
 
     found = list(ctx.ec2.vpcs.filter(Filters=[{
         'Name': 'tag:Name',
-        'Values': ['nanobox-%s' % env],
+        'Values': ['microbox-%s' % env],
     }]))
     ctx.trace('found: %s' % found)
 
@@ -83,10 +83,10 @@ def environment_setup(ctx, env, info):
         ctx.vpc[env].wait_until_available()
         ctx.vpc[env].create_tags(Tags=[{
             'Key': 'Name',
-            'Value': 'nanobox-%s' % env,
+            'Value': 'microbox-%s' % env,
         },
             {
-            'Key': 'Nanobox',
+            'Key': 'Microbox',
             'Value': 'true',
         }])
         ctx.trace('created VPC: %s' % ctx.vpc[env])
@@ -106,10 +106,10 @@ def environment_setup(ctx, env, info):
         gw = ctx.ec2.create_internet_gateway()
         gw.create_tags(Tags=[{
             'Key': 'Name',
-            'Value': 'nanobox-%s GW' % env,
+            'Value': 'microbox-%s GW' % env,
         },
             {
-            'Key': 'Nanobox',
+            'Key': 'Microbox',
             'Value': 'true',
         }])
         gw.attach_to_vpc(VpcId=ctx.vpc[env].vpc_id)
@@ -124,7 +124,7 @@ def environment_security(ctx, env):
 
     subnets = list(ctx.ec2.subnets.filter(Filters=[{
         'Name': 'tag:Name',
-        'Values': ['nanobox-%s subnet' % env],
+        'Values': ['microbox-%s subnet' % env],
     }]))
     ctx.trace('found: %s' % subnets)
 
@@ -136,10 +136,10 @@ def environment_security(ctx, env):
         )
         subnet.create_tags(Tags=[{
             'Key': 'Name',
-            'Value': 'nanobox-%s subnet' % env,
+            'Value': 'microbox-%s subnet' % env,
         },
             {
-            'Key': 'Nanobox',
+            'Key': 'Microbox',
             'Value': 'true',
         }])
         ctx.trace('created subnet: %s' % subnet)
@@ -166,23 +166,23 @@ def environment_acls(ctx, env, info):
 
         subnet = list(ctx.ec2.subnets.filter(Filters=[{
             'Name': 'tag:Name',
-            'Values': ['nanobox-%s-%s subnet' % (env, zone)],
+            'Values': ['microbox-%s-%s subnet' % (env, zone)],
         }]))[0]
         secgrp = list(ctx.vpc[env].security_groups.filter(Filters=[{
             'Name': 'group-name',
-            'Values': ['nanobox-%s-%s secgrp' % (env, zone)],
+            'Values': ['microbox-%s-%s secgrp' % (env, zone)],
         }]))[0]
     else:
         subnet = list(ctx.ec2.subnets.filter(Filters=[{
             'Name': 'tag:Name',
-            'Values': ['nanobox-%s subnet' % env],
+            'Values': ['microbox-%s subnet' % env],
         }]))[0]
         secgrp = list(ctx.vpc[env].security_groups.filter(Filters=[{
             'Name': 'group-name',
             'Values': ['default'],
         }]))[0]
 
-    user = ctx.iam.User('nanobox-%s' % env)
+    user = ctx.iam.User('microbox-%s' % env)
     try:
         user.load()
         ctx.trace('using user: %s' % user)
@@ -195,7 +195,7 @@ def environment_acls(ctx, env, info):
     key = user.create_access_key_pair()
     ctx.trace('created keypair: %s' % (key))
 
-    policy = user.Policy('NanoboxDeployment-%s' % env)
+    policy = user.Policy('MicroboxDeployment-%s' % env)
     try:
         policy.load()
         ctx.trace('using policy: %s' % policy)
@@ -255,7 +255,7 @@ def zone_setup(ctx, env, zone, info):
 
     subnets = list(ctx.ec2.subnets.filter(Filters=[{
         'Name': 'tag:Name',
-        'Values': ['nanobox-%s-%s subnet' % (env, zone)],
+        'Values': ['microbox-%s-%s subnet' % (env, zone)],
     }]))
     ctx.trace('found: %s' % subnets)
 
@@ -272,10 +272,10 @@ def zone_setup(ctx, env, zone, info):
         )
         subnet.create_tags(Tags=[{
             'Key': 'Name',
-            'Value': 'nanobox-%s-%s subnet' % (env, zone),
+            'Value': 'microbox-%s-%s subnet' % (env, zone),
         },
             {
-            'Key': 'Nanobox',
+            'Key': 'Microbox',
             'Value': 'true',
         }])
         ctx.trace('created subnet: %s' % subnet)
@@ -307,14 +307,14 @@ def zone_security(ctx, env, zone, info):
         'in': {
             target: (list(ctx.ec2.subnets.filter(Filters=[{
                 'Name': 'tag:Name',
-                'Values': ['nanobox-%s-%s subnet' % (env, target)],
+                'Values': ['microbox-%s-%s subnet' % (env, target)],
             }]))[0].cidr_block if target != 'pub' else '0.0.0.0/0')
             for target in info['networking']['in']
         } if 'in' in info['networking'] else {},
         'out': {
             target: (list(ctx.ec2.subnets.filter(Filters=[{
                 'Name': 'tag:Name',
-                'Values': ['nanobox-%s-%s subnet' % (env, target)],
+                'Values': ['microbox-%s-%s subnet' % (env, target)],
             }]))[0].cidr_block if target != 'pub' else '0.0.0.0/0')
             for target in info['networking']['out']
         } if 'out' in info['networking'] else {},
@@ -323,7 +323,7 @@ def zone_security(ctx, env, zone, info):
 
     found = list(ctx.vpc[env].security_groups.filter(Filters=[{
         'Name': 'group-name',
-        'Values': ['nanobox-%s-%s secgrp' % (env, zone)],
+        'Values': ['microbox-%s-%s secgrp' % (env, zone)],
     }]))
     ctx.trace('found: %s' % found)
 
@@ -332,7 +332,7 @@ def zone_security(ctx, env, zone, info):
 
         sgrp = ctx.vpc[env].create_security_group(
             Description='%s security group for the %s zone' % (env, zone),
-            GroupName='nanobox-%s-%s secgrp' % (env, zone),
+            GroupName='microbox-%s-%s secgrp' % (env, zone),
         )
         ctx.trace('created security group: %s' % sgrp)
 

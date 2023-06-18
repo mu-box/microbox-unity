@@ -57,7 +57,7 @@ docs/_build/
 # PyBuilder
 target/
 
-nanobox.yml
+microbox.yml
 
 .vagrant
 *.md5

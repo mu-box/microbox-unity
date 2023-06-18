@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Update the upgrade script for nanobox
+# Update the upgrade script for microbox
 
 # exit if any any command fails
 set -e
@@ -20,12 +20,12 @@ trap cleanup EXIT
 download_upgrade() {
   # download file
   echo "Downloading update script"
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/vpn/ubuntu/upgrade > ${TMPFILE}
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/vpn/ubuntu/upgrade > ${TMPFILE}
 }
 
 download_checksum() {
   # download checksum
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/vpn/ubuntu/upgrade.md5
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/vpn/ubuntu/upgrade.md5
 }
 
 checksum_file() {

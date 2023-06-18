@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Upgrade the nanobox environment on the system.
+# Upgrade the microbox environment on the system.
 
 # exit if any any command fails
 set -e
@@ -101,7 +101,7 @@ END
 
 firewall_upstart_conf() {
   cat <<'END'
-description "Nanobox firewall base lockdown"
+description "Microbox firewall base lockdown"
 
 start on runlevel [2345]
 
@@ -119,7 +119,7 @@ END
 firewall_systemd_conf() {
   cat <<'END'
 [Unit]
-Description=Nanobox firewall base lockdown
+Description=Microbox firewall base lockdown
 
 [Service]
 Type=oneshot
@@ -178,10 +178,10 @@ ensure_variables_have_values() {
   prompt_user KEY_COUNTRY "Enter the country code (e.g. US, CA, AU): "
   prompt_user KEY_PROVINCE "Enter the state/province name (e.g Idaho, Alberta, Queensland): "
   prompt_user KEY_CITY "Enter the city name (e.g Rexburg, Aetna, Nebo): "
-  prompt_user KEY_ORG "Enter the organization name (e.g Nanobox): "
-  prompt_user KEY_EMAIL "Enter the administrator email (e.g admin@nanobox.io): "
-  prompt_user KEY_CN "Enter the common name (e.g unity.nanobox.io): "
-  prompt_user KEY_NAME "Enter the name (e.g vpn.unity.nanobox.io): "
+  prompt_user KEY_ORG "Enter the organization name (e.g Microbox): "
+  prompt_user KEY_EMAIL "Enter the administrator email (e.g admin@microbox.cloud): "
+  prompt_user KEY_CN "Enter the common name (e.g unity.microbox.cloud): "
+  prompt_user KEY_NAME "Enter the name (e.g vpn.unity.microbox.cloud): "
   prompt_user KEY_ALTNAMES "Enter the alt name (e.g vpn): "
   prompt_user KEY_OU "Enter the organizational unit (e.g web): "
   prompt_user VPN_SUBNET "Enter the subnet to use for the VPN service (e.g 10.0.100.0): "
@@ -275,7 +275,7 @@ export KEY_ALTNAMES=${KEY_ALTNAMES}
 # You will also need to make sure your OpenVPN server config has the duplicate-cn option set
 export KEY_CN=${KEY_CN}
 
-# Extra data for Nanobox
+# Extra data for Microbox
 export VPN_SUBNET=${VPN_SUBNET}
 export VPN_NETMASK=${VPN_NETMASK}
 export VPC_SUBNET=${VPC_SUBNET}
@@ -293,7 +293,7 @@ generate_ca() {
 
 generate_dh() {
   [ -f /etc/openvpn/easy-rsa/keys/dh2048.pem ] || (cd /etc/openvpn/easy-rsa; source vars; ./build-dh)
-} 
+}
 
 generate_server_certificate() {
   [ -f /etc/openvpn/easy-rsa/keys/${KEY_NAME}.crt ] || (cd /etc/openvpn/easy-rsa; source vars; ./build-key-server $KEY_NAME )
@@ -634,12 +634,12 @@ END
 download_openvpn_scripts() {
   # download file
   echo "Downloading ovpn script"
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/vpn/unity-ovpn.tar.gz > ${TMPFILE}
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/vpn/unity-ovpn.tar.gz > ${TMPFILE}
 }
 
 download_openvpn_scripts_checksum() {
   # download checksum
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/vpn/unity-ovpn.md5
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/vpn/unity-ovpn.md5
 }
 
 checksum_openvpn_scripts() {

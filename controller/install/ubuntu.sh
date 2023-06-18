@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Boostraps an ubuntu machine to be used as an agent for nanobox
+# Boostraps an ubuntu machine to be used as an agent for microbox
 
 # exit if any any command fails
 set -e
@@ -119,7 +119,7 @@ start_docker() {
 
 configure_modloader() {
   if [[ "$(init_system)" = "systemd" ]]; then
-    echo 'ip_vs' > /etc/modules-load.d/nanobox-ipvs.conf
+    echo 'ip_vs' > /etc/modules-load.d/microbox-ipvs.conf
   elif [[ "$(init_system)" = "upstart" ]]; then
     grep 'ip_vs' /tmpetc/modules &> /dev/null || echo 'ip_vs' >> /etc/modules
   fi
@@ -247,7 +247,7 @@ END
 
 firewall_upstart_conf() {
   cat <<'END'
-description "Nanobox firewall base lockdown"
+description "Microbox firewall base lockdown"
 
 start on runlevel [2345]
 
@@ -265,7 +265,7 @@ END
 firewall_systemd_conf() {
   cat <<'END'
 [Unit]
-Description=Nanobox firewall base lockdown
+Description=Microbox firewall base lockdown
 
 [Service]
 Type=oneshot
@@ -319,9 +319,9 @@ ensure_variables_have_values() {
 
 generate_cryptograpic_keys() {
   echo "Generating cryptograpic keys"
-  SECRET_KEY_BASE=$(docker run --rm nanobox/unity-core nanobox keygen | grep KEY | awk '{print $2}')
-  SHAMAN_TOKEN=$(docker run --rm nanobox/unity-core nanobox keygen | grep KEY | awk '{print $2}')
-  PROXY_TOKEN=$(docker run --rm nanobox/unity-core nanobox keygen | grep KEY | awk '{print $2}')
+  SECRET_KEY_BASE=$(docker run --rm mubox/unity-core microbox keygen | grep KEY | awk '{print $2}')
+  SHAMAN_TOKEN=$(docker run --rm mubox/unity-core microbox keygen | grep KEY | awk '{print $2}')
+  PROXY_TOKEN=$(docker run --rm mubox/unity-core microbox keygen | grep KEY | awk '{print $2}')
 }
 
 create_unity_env_file() {
@@ -365,26 +365,26 @@ services:
     volumes:
       - 'db_data:/var/lib/postgresql/data'
     env_file:
-      - '/etc/nanobox/.env'
-      
+      - '/etc/microbox/.env'
+
   # the sidekiq worker queue
   queue:
     image: 'redis:4.0-alpine'
     volumes:
       - 'queue_data:/data'
     env_file:
-      - '/etc/nanobox/.env'
-  
+      - '/etc/microbox/.env'
+
   # libcloud adapters
   adapter:
-    image: 'nanobox/unity-adapter'
-    command: gunicorn -c /app/etc/gunicorn.py nanobox_libcloud:app
+    image: 'mubox/unity-adapter'
+    command: gunicorn -c /app/etc/gunicorn.py microbox_libcloud:app
     env_file:
-      - '/etc/nanobox/.env'
-      
+      - '/etc/microbox/.env'
+
   # shaman convenience dns for hosted apps
   dns:
-    image: 'nanobox/unity-dns'
+    image: 'mubox/unity-dns'
     volumes:
       - 'dns_data:/var/db/shaman'
     command: shaman -c /etc/shaman/config.json -t $SHAMAN_TOKEN
@@ -393,8 +393,8 @@ services:
     expose:
       - "1632"
     env_file:
-      - '/etc/nanobox/.env'
-      
+      - '/etc/microbox/.env'
+
   # nginx proxy for this app
   router:
     image: jwilder/nginx-proxy:alpine
@@ -402,11 +402,11 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-  
+
   # unity web service
   web:
-    image: 'nanobox/unity-core'
-    command: nanobox server
+    image: 'mubox/unity-core'
+    command: microbox server
     expose:
       - "8080"
     depends_on:
@@ -416,14 +416,14 @@ services:
       - dns
       - proxy
     env_file:
-      - '/etc/nanobox/.env'
+      - '/etc/microbox/.env'
     environment:
       VIRTUAL_HOST: "dashboard.${DOMAIN},api.${DOMAIN}"
-    
+
   # unity workers
   worker:
-    image: 'nanobox/unity-core'
-    command: nanobox worker
+    image: 'mubox/unity-core'
+    command: microbox worker
     depends_on:
       - db
       - queue
@@ -431,18 +431,18 @@ services:
       - dns
       - proxy
     env_file:
-      - '/etc/nanobox/.env'
-      
+      - '/etc/microbox/.env'
+
   # the dashboard proxy to end-run browser security issues
   proxy:
-    image: 'nanobox/unity-proxy'
+    image: 'mubox/unity-proxy'
     volumes:
       - 'proxy_data:/var/db/portal'
     command: portal -c /etc/portal/config.json -t $PROXY_TOKEN
     ports:
       - "8444:8444"
     env_file:
-      - '/etc/nanobox/.env'
+      - '/etc/microbox/.env'
     environment:
       VIRTUAL_HOST: "proxy.${DOMAIN}"
 
@@ -455,9 +455,9 @@ END
 }
 
 configure_unity() {
-  [ -d /etc/nanobox ] || mkdir /etc/nanobox
-  echo "$(create_unity_env_file)" > /etc/nanobox/.env
-  echo "$(unity_yml)" > /etc/nanobox/unity.yml
+  [ -d /etc/microbox ] || mkdir /etc/microbox
+  echo "$(create_unity_env_file)" > /etc/microbox/.env
+  echo "$(unity_yml)" > /etc/microbox/unity.yml
   # create init script
   if [[ "$(init_system)" = "systemd" ]]; then
     echo "$(unity_systemd_conf)" > /etc/systemd/system/unity.service
@@ -468,7 +468,7 @@ configure_unity() {
 }
 
 setup_database() {
-  (cd /etc/nanobox; docker-compose -f /etc/nanobox/unity.yml run web nanobox migrate)
+  (cd /etc/microbox; docker-compose -f /etc/microbox/unity.yml run web microbox migrate)
 }
 
 start_unity() {
@@ -486,14 +486,14 @@ start_unity() {
 
 unity_upstart_conf() {
   cat <<'END'
-description "Nanobox Unity"
+description "Microbox Unity"
 
 start on runlevel [2345]
 
 script
 
-chdir /etc/nanobox/
-docker-compose -f /etc/nanobox/unity.yml up
+chdir /etc/microbox/
+docker-compose -f /etc/microbox/unity.yml up
 
 end script
 END
@@ -502,13 +502,13 @@ END
 unity_systemd_conf() {
   cat <<'END'
 [Unit]
-Description=Nanobox Unity
+Description=Microbox Unity
 
 [Service]
-EnvironmentFile=/etc/nanobox/.env
-WorkingDirectory=/etc/nanobox
-ExecStart=/usr/bin/docker-compose -f /etc/nanobox/unity.yml up
-ExecStop=/usr/bin/docker-compose -f /etc/nanobox/unity.yml down
+EnvironmentFile=/etc/microbox/.env
+WorkingDirectory=/etc/microbox
+ExecStart=/usr/bin/docker-compose -f /etc/microbox/unity.yml up
+ExecStop=/usr/bin/docker-compose -f /etc/microbox/unity.yml down
 
 [Install]
 WantedBy=multi-user.target
@@ -567,11 +567,11 @@ run start_modloader "Starting modloader"
 #run start_firewall "Starting firewall"
 
 generate_cryptograpic_keys
-run setup_database "Setting up Nanobox Database"
-run configure_unity "Configuring Nanobox Unity"
-run start_unity "Starting Nanobox Unity"
+run setup_database "Setting up Microbox Database"
+run configure_unity "Configuring Microbox Unity"
+run start_unity "Starting Microbox Unity"
 
-#run create_nanobox_environment "Creating environment for nanobox"
-#run docker_compose_nanobox "Starting nanobox services"
+#run create_microbox_environment "Creating environment for microbox"
+#run docker_compose_microbox "Starting microbox services"
 
-echo "+> Nanobox now starting..."
+echo "+> Microbox now starting..."

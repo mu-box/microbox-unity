@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Upgrade the nanobox environment on the system.
+# Upgrade the microbox environment on the system.
 
 # exit if any any command fails
 set -e
@@ -14,8 +14,8 @@ trap cleanup EXIT
 
 # source current settings
 
-if [ -f /etc/nanobox/.env ]; then
-  . /etc/nanobox/.env
+if [ -f /etc/microbox/.env ]; then
+  . /etc/microbox/.env
 fi
 
 wait_for_lock() {

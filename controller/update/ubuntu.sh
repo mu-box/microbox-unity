@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Update the upgrade script for nanobox
+# Update the upgrade script for microbox
 
 # exit if any any command fails
 set -e
@@ -20,12 +20,12 @@ trap cleanup EXIT
 download_upgrade() {
   # download file
   echo "Downloading update script"
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/controller/ubuntu/upgrade > ${TMPFILE}
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/controller/ubuntu/upgrade > ${TMPFILE}
 }
 
 download_checksum() {
   # download checksum
-  curl -s https://s3.amazonaws.com/unity.nanobox.io/bootstrap/controller/ubuntu/upgrade.md5
+  curl -s https://s3.amazonaws.com/unity.microbox.cloud/bootstrap/controller/ubuntu/upgrade.md5
 }
 
 checksum_file() {
@@ -37,7 +37,7 @@ install_file() {
   # move into place if checksums match
   echo "Verifying checksums"
   if [ "$(download_checksum)" = "$(checksum_file)" ]; then
-    cp $TMPFILE /usr/bin/nanobox-upgrade
+    cp $TMPFILE /usr/bin/microbox-upgrade
     echo "Update complete"
   else
     echo "Error: Checksums didn't match"
